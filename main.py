@@ -122,4 +122,4 @@ def run_speedtest():
 
 # Uruchomienie aplikacji Flask na porcie 2000
 if __name__ == '__main__':
-    app.run(port=80)
+    app.run(port=5000)
