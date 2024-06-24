@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Zużycie Zasobów i Speedtest</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Zużycie Zasobów i Speedtest</h1>
+
+    <div>
+        <h2>Procesor (CPU)</h2>
+        <div style="width: 800px; height: 400px;">
+            <canvas id="cpuChart"></canvas>
+        </div>
+    </div>
+
+    <div>
+        <h2>Pamięć RAM</h2>
+        <div style="width: 800px; height: 400px;">
+            <canvas id="ramChart"></canvas>
+        </div>
+    </div>
+
+    <div>
+        <h2>Zużycie Internetu</h2>
+        <div style="width: 800px; height: 400px;">
+            <canvas id="downloadChart"></canvas>
+            <p>Pobieranie (Mbps)</p>
+        </div>
+        <div style="width: 800px; height: 400px;">
+            <canvas id="uploadChart"></canvas>
+            <p>Wysyłanie (Mbps)</p>
+        </div>
+    </div>
+
+    <div>
+        <h2>Wynik Speedtestu</h2>
+        <p>
+            <button onclick="runSpeedtest()">Uruchom Speedtest</button>
+            <span id="speedtestResults">Brak wyników</span>
+        </p>
+    </div>
+
+    <script>
+        // Funkcja do rysowania wykresu
+        function drawChart(chartId, labels, data, label) {
+            var ctx = document.getElementById(chartId).getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        data: data,
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            });
+        }
+
+        // Funkcja do aktualizowania danych na wykresach
+        function updateCharts() {
+            fetch('/cpu_data')
+                .then(response => response.json())
+                .then(data => {
+                    var labels = data.map(item => item[0]);
+                    var cpu_percent = data.map(item => item[1]);
+                    drawChart('cpuChart', labels, cpu_percent, 'CPU %');
+                });
+
+            fetch('/ram_data')
+                .then(response => response.json())
+                .then(data => {
+                    var labels = data.map(item => item[0]);
+                    var ram_percent = data.map(item => item[1]);
+                    drawChart('ramChart', labels, ram_percent, 'RAM %');
+                });
+
+            fetch('/internet_data')
+                .then(response => response.json())
+                .then(data => {
+                    var downloadLabels = data.download.map(item => item[0]);
+                    var downloadValues = data.download.map(item => item[1]);
+                    drawChart('downloadChart', downloadLabels, downloadValues, 'Download (Mbps)');
+
+                    var uploadLabels = data.upload.map(item => item[0]);
+                    var uploadValues = data.upload.map(item => item[1]);
+                    drawChart('uploadChart', uploadLabels, uploadValues, 'Upload (Mbps)');
+                });
+        }
+
+        // Aktualizuj co 1 sekundę
+        setInterval(updateCharts, 1000);
+
+        // Funkcja do uruchamiania speedtestu
+        function runSpeedtest() {
+            fetch('/speedtest', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    updateCharts();  // Aktualizuj wykresy po wykonaniu speedtestu
+                    var speedtestResults = document.getElementById('speedtestResults');
+                    speedtestResults.textContent = `Pobieranie: ${data.download_speed.toFixed(2)} Mbps, Wysyłanie: ${data.upload_speed.toFixed(2)} Mbps`;
+                });
+        }
+    </script>
+</body>
+</html>
