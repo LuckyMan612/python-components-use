@@ -16,6 +16,8 @@ cpu_data = []
 ram_data = []
 download_data = []
 upload_data = []
+previous_recv = psutil.net_io_counters().bytes_recv
+previous_sent = psutil.net_io_counters().bytes_sent
 
 # Funkcja monitorująca zużycie CPU
 def monitor_cpu():
@@ -47,28 +49,25 @@ def monitor_ram():
 ram_thread = Thread(target=monitor_ram)
 ram_thread.start()
 
-# Funkcja do monitorowania internetu dla interfejsu Ethernet
 def monitor_internet():
-    global download_data, upload_data
+    global download_data, upload_data, previous_recv, previous_sent
+    
     while True:
-        try:
-            # Uzyskanie danych dla interfejsu sieciowego Ethernet
-            current_stats = psutil.net_io_counters(pernic=True)['Ethernet']
-            download_speed = current_stats.bytes_recv * 8 / 1e6  # Mbps
-            upload_speed = current_stats.bytes_sent * 8 / 1e6  # Mbps
+        current_recv = psutil.net_io_counters().bytes_recv
+        current_sent = psutil.net_io_counters().bytes_sent
+        
+        download_speed = (current_recv - previous_recv) / 100000  # przeliczenie na Mbps
+        upload_speed = (current_sent - previous_sent) / 100000  # przeliczenie na Mbps
+        
+        if download_speed > 0 or upload_speed > 0:
             timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             download_data.append((timestamp, download_speed))
             upload_data.append((timestamp, upload_speed))
-        except KeyError:
-            # Obsłużenie błędu, jeśli interfejs 'Ethernet' nie jest dostępny
-            download_data.append((datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 0))
-            upload_data.append((datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 0))
+            
+            previous_recv = current_recv
+            previous_sent = current_sent
         
-        # Usuwanie starszych danych
-        download_data = [(t, d) for t, d in download_data if datetime.strptime(t, '%Y-%m-%d %H:%M:%S') > datetime.now() - MAX_DATA_AGE]
-        upload_data = [(t, u) for t, u in upload_data if datetime.strptime(t, '%Y-%m-%d %H:%M:%S') > datetime.now() - MAX_DATA_AGE]
-        
-        time.sleep(1)  # sprawdzamy co sekundę
+        time.sleep(1)  # sprawdzanie co sekundę
 
 # Wątek do monitorowania internetu
 internet_thread = Thread(target=monitor_internet)
