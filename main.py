@@ -8,8 +8,8 @@ import speedtest
 # Inicjalizacja aplikacji Flask
 app = Flask(__name__)
 
-# Stała definiująca maksymalny czas przechowywania danych (24 godziny)
-MAX_DATA_AGE = timedelta(hours=24)
+# Stała definiująca maksymalny czas przechowywania danych (15 godzin)
+MAX_DATA_AGE = timedelta(hours=15)
 
 # Lista do przechowywania danych
 cpu_data = []
