@@ -14,11 +14,11 @@ This project provides a monitoring and speedtest dashboard for monitoring variou
 - psutil
 - speedtest-cli
 ## Installation
-1. Clone the repository: ``https://github.com/LuckyMan612/python-components-use.git``
+1. Clone the repository: ``git clone https://github.com/LuckyMan612/python-components-use.git``
 ``cd python-components-use``
 2. Start the Flask server: `python main.py`
-3. Access the dashboard:
-Open a web browser and go to http://localhost:2000 (or replace localhost with your server's IP address).
+3. Open port :2000
+4. Access the dashboard: Open a web browser and go to http://localhost:2000 (or replace localhost with your server's IP address).
 ## Usage
 - Dashboard: View real-time charts for CPU usage, RAM usage, and internet usage (download and upload speeds).
 - Speedtest: Click on the "Run Speedtest" button to perform a speedtest and see the results displayed on the dashboard.
