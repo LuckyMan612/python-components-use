@@ -14,7 +14,7 @@ This project provides a monitoring and speedtest dashboard for monitoring variou
 - psutil
 - speedtest-cli
 ## Installation
-1. Clone the repository: ``git clone https://github.com/your-username/python-components-use.git``
+1. Clone the repository: ``https://github.com/LuckyMan612/python-components-use.git``
 ``cd python-components-use``
 2. Start the Flask server: `python main.py`
 3. Access the dashboard:
